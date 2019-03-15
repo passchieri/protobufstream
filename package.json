@@ -1,6 +1,6 @@
 {
   "name": "protobufstream",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Stream implementation of a protobuf message encoder/decoder.",
   "main": "src/index.js",
   "scripts": {
