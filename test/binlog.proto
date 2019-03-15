@@ -1,0 +1,9 @@
+syntax = "proto3";
+package binlog;
+
+message BinLog {
+    required string type = 1;
+    required string key = 2;
+    uint64 timestamp = 3;
+    required bytes data = 4;
+}

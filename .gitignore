@@ -26,3 +26,12 @@ build/Release
 # Dependency directory
 # https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules
+
+# Temporary editor files
+*.swp
+
+#Anything we most likely do not want to share
+local*.sh
+*credentials*
+
+.vscode
