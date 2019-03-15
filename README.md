@@ -24,8 +24,8 @@ Usage example
 
 ```javascript
 var decoder = require('protobufstream')({
-    protoFile: "./test/binlog.proto",
-    messageType: "binlog.BinLog",
+    protoFile: "./path/to/proto.file",
+    messageType: "message.type.in.proto.file",
     direction: "decode"
 });
 var stream new SomeInputStreamOfProtobufMessages()
