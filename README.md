@@ -38,7 +38,8 @@ s.on('data',(data)=> {
 License
 -------
 (ISC)
-Copyright (c) 2019,  <Igor Passchier>
+
+Copyright (c) 2019,  &lt;Igor Passchier&gt;
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
