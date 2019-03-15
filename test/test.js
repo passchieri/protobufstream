@@ -1,6 +1,6 @@
 var { should, expect } = require('chai');
 should = should();
-const ProtobufCodec = require('../src/ProtobufCodec');
+const ProtobufTransform = require('../src/ProtobufTransform');
 var { Readable } = require('stream');
 
 var msg = {
@@ -10,21 +10,21 @@ var msg = {
     data: Buffer.from("This can be any content")
 }
 
-describe('ProtobufCodec', () => {
+describe('ProtobufTransform', () => {
     function callConstructor(options) {
-        return new ProtobufCodec(options);
+        return new ProtobufTransform(options);
     }
     it('should throw an error on construction withouth correct options', () => {
         expect(() => {
-            new ProtobufCodec({})
+            new ProtobufTransform({})
         }).to.throw(/options.protoFile/);
         expect(() => {
-            new ProtobufCodec({ protoFile: "./test/binlog.proto" })
+            new ProtobufTransform({ protoFile: "./test/binlog.proto" })
         }).to.throw(/options.messageType/);
 
     })
     it('encode and decode a sample binlog message', () => {
-        var codec = new ProtobufCodec({
+        var codec = new ProtobufTransform({
             protoFile: "./test/binlog.proto",
             messageType: "binlog.BinLog",
             direction: "decode"
@@ -41,7 +41,7 @@ describe('ProtobufCodec', () => {
         buf.should.be.instanceOf(Buffer);
     })
 
-    var decoder = require('../src/ProtobufCodec')({
+    var decoder = require('../src/ProtobufTransform')({
         protoFile: "./test/binlog.proto",
         messageType: "binlog.BinLog",
         direction: "decode"
@@ -55,7 +55,7 @@ describe('ProtobufCodec', () => {
                 this.push(null);
             }
         });
-        var encoder = require('../src/ProtobufCodec')({
+        var encoder = require('../src/ProtobufTransform')({
             protoFile: "./test/binlog.proto",
             messageType: "binlog.BinLog",
             direction: "encode"
@@ -74,7 +74,7 @@ describe('ProtobufCodec', () => {
     })
 
     it('decode message via transform', (done) => {
-        var decoder = require('../src/ProtobufCodec')({
+        var decoder = require('../src/ProtobufTransform')({
             protoFile: "./test/binlog.proto",
             messageType: "binlog.BinLog",
             direction: "decode"

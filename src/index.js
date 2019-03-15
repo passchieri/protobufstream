@@ -1,1 +1,1 @@
-module.exports=require('./ProtobufCodec');
+module.exports=require('./ProtobufTransform');
