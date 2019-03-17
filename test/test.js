@@ -7,14 +7,20 @@ var msg = {
     type: "TYPE",
     key: "key",
     timestamp: Date.now(),
-    data: Buffer.from("This can be any content")
+    data: Buffer.from("This can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any contentThis can be any content")
+}
+var msgSecond = {
+    type: "OTHER",
+    key: "other.key",
+    timestamp: Date.now(),
+    data: Buffer.from("Second message")
 }
 
 describe('ProtobufTransform', () => {
     function callConstructor(options) {
         return new ProtobufTransform(options);
     }
-    it('should throw an error on construction withouth correct options', () => {
+    it('throw an error on construction withouth correct options', () => {
         expect(() => {
             new ProtobufTransform({})
         }).to.throw(/options.protoFile/);
@@ -73,6 +79,36 @@ describe('ProtobufTransform', () => {
         })
     })
 
+    it('encode multiple messages via transform', (done) => {
+        var s = new Readable({
+            objectMode: true,
+            read: function () {
+                this.push(msg);
+                this.push(msgSecond)
+                this.push(null);
+            }
+        });
+        var encoder = require('../src/ProtobufTransform')({
+            protoFile: "./test/binlog.proto",
+            messageType: "binlog.BinLog",
+            direction: "encode"
+        });
+
+        var count = 0;
+        var sc = s.pipe(encoder)
+        sc.on('data', data => {
+            data.should.be.instanceOf(Buffer);
+            count++;
+        });
+        sc.on('finish', () => {
+            if (count != 2) done('Not 2 messages seen');
+            done()
+        });
+        sc.on('error', (err) => {
+            done(err)
+        })
+    })
+
     it('decode message via transform', (done) => {
         var decoder = require('../src/ProtobufTransform')({
             protoFile: "./test/binlog.proto",
@@ -95,6 +131,106 @@ describe('ProtobufTransform', () => {
         });
         sc.on('finish', () => {
             done()
+        });
+        sc.on('error', (err) => {
+            done(err)
+        })
+    })
+    it('decode multiple messages via transform', (done) => {
+        var decoder = require('../src/ProtobufTransform')({
+            protoFile: "./test/binlog.proto",
+            messageType: "binlog.BinLog",
+            direction: "decode"
+        });
+
+        var buf = decoder.encode(msg);
+        var s = new Readable({
+            objectMode: true,
+            read: function () {
+                this.push(buf);
+                this.push(buf);
+                this.push(null);
+            }
+        });
+        var count = 0;
+        var sc = s.pipe(decoder)
+        sc.on('data', data => {
+            data.should.be.a('object');
+            count++;
+        });
+        sc.on('finish', () => {
+            if (count != 2) {
+                done('Not 2 messages seen');
+            } else {
+                done()
+            }
+        });
+        sc.on('error', (err) => {
+            done(err)
+        })
+    })
+    it('handle buffers with multiple messages', (done) => {
+        var decoder = require('../src/ProtobufTransform')({
+            protoFile: "./test/binlog.proto",
+            messageType: "binlog.BinLog",
+            direction: "decode"
+        });
+
+        var buf = decoder.encode(msg);
+        var s = new Readable({
+            objectMode: true,
+            read: function () {
+                var b = Buffer.concat([buf,buf]);
+                this.push(b);
+                this.push(null);
+            }
+        });
+        var count = 0;
+        var sc = s.pipe(decoder)
+        sc.on('data', data => {
+            data.should.be.a('object');
+            count++;
+        });
+        sc.on('finish', () => {
+            if (count != 2) {
+                done('Not 2 messages seen')
+            } else {
+                done();
+            }
+        });
+        sc.on('error', (err) => {
+            done(err)
+        })
+    })
+    it('handle buffers with partial messages', (done) => {
+        var decoder = require('../src/ProtobufTransform')({
+            protoFile: "./test/binlog.proto",
+            messageType: "binlog.BinLog",
+            direction: "decode"
+        });
+
+        var buf = decoder.encode(msg);
+        var s = new Readable({
+            objectMode: true,
+            read: function () {
+                var b = Buffer.concat([buf,buf]);
+                this.push(b.slice(0,10));
+                this.push(b.slice(10))
+                this.push(null);
+            }
+        });
+        var count = 0;
+        var sc = s.pipe(decoder)
+        sc.on('data', data => {
+            data.should.be.a('object');
+            count++;
+        });
+        sc.on('finish', () => {
+            if (count != 2) {
+                done('Not 2 messages seen, but: '+count)
+            } else {
+                done();
+            }
         });
         sc.on('error', (err) => {
             done(err)
