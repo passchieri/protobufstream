@@ -23,10 +23,9 @@ Usage example
 -------------
 
 ```javascript
-var decoder = require('protobufstream')({
+var decoder = require('protobufstream').createDecoder({
     protoFile: "./path/to/proto.file",
-    messageType: "message.type.in.proto.file",
-    direction: "decode"
+    messageType: "message.type.in.proto.file"
 });
 var stream new SomeInputStreamOfProtobufMessages()
 var s=stream.pipe(decoder);

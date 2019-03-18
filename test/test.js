@@ -47,10 +47,9 @@ describe('ProtobufTransform', () => {
         buf.should.be.instanceOf(Buffer);
     })
 
-    var decoder = require('../src/ProtobufTransform')({
+    var decoder = require('../src/ProtobufTransform').createDecoder({
         protoFile: "./test/binlog.proto",
-        messageType: "binlog.BinLog",
-        direction: "decode"
+        messageType: "binlog.BinLog"
     });
 
     it('encode message via transform', (done) => {
@@ -61,10 +60,9 @@ describe('ProtobufTransform', () => {
                 this.push(null);
             }
         });
-        var encoder = require('../src/ProtobufTransform')({
+        var encoder = require('../src/ProtobufTransform').createEncoder({
             protoFile: "./test/binlog.proto",
-            messageType: "binlog.BinLog",
-            direction: "encode"
+            messageType: "binlog.BinLog"
         });
 
         var sc = s.pipe(encoder)
@@ -88,10 +86,9 @@ describe('ProtobufTransform', () => {
                 this.push(null);
             }
         });
-        var encoder = require('../src/ProtobufTransform')({
+        var encoder = require('../src/ProtobufTransform').createEncoder({
             protoFile: "./test/binlog.proto",
-            messageType: "binlog.BinLog",
-            direction: "encode"
+            messageType: "binlog.BinLog"
         });
 
         var count = 0;
@@ -110,13 +107,12 @@ describe('ProtobufTransform', () => {
     })
 
     it('decode message via transform', (done) => {
-        var decoder = require('../src/ProtobufTransform')({
+        var decoder = require('../src/ProtobufTransform').createDecoder({
             protoFile: "./test/binlog.proto",
-            messageType: "binlog.BinLog",
-            direction: "decode"
+            messageType: "binlog.BinLog"
         });
 
-        var buf = decoder.encode(msg);
+        var buf = decoder.encode(msg, true);
         var s = new Readable({
             objectMode: true,
             read: function () {
@@ -137,13 +133,12 @@ describe('ProtobufTransform', () => {
         })
     })
     it('decode multiple messages via transform', (done) => {
-        var decoder = require('../src/ProtobufTransform')({
+        var decoder = require('../src/ProtobufTransform').createDecoder({
             protoFile: "./test/binlog.proto",
-            messageType: "binlog.BinLog",
-            direction: "decode"
+            messageType: "binlog.BinLog"
         });
 
-        var buf = decoder.encode(msg);
+        var buf = decoder.encode(msg, true);
         var s = new Readable({
             objectMode: true,
             read: function () {
@@ -170,17 +165,16 @@ describe('ProtobufTransform', () => {
         })
     })
     it('handle buffers with multiple messages', (done) => {
-        var decoder = require('../src/ProtobufTransform')({
+        var decoder = require('../src/ProtobufTransform').createDecoder({
             protoFile: "./test/binlog.proto",
-            messageType: "binlog.BinLog",
-            direction: "decode"
+            messageType: "binlog.BinLog"
         });
 
-        var buf = decoder.encode(msg);
+        var buf = decoder.encode(msg, true);
         var s = new Readable({
             objectMode: true,
             read: function () {
-                var b = Buffer.concat([buf,buf]);
+                var b = Buffer.concat([buf, buf]);
                 this.push(b);
                 this.push(null);
             }
@@ -203,18 +197,17 @@ describe('ProtobufTransform', () => {
         })
     })
     it('handle buffers with partial messages', (done) => {
-        var decoder = require('../src/ProtobufTransform')({
+        var decoder = require('../src/ProtobufTransform').createDecoder({
             protoFile: "./test/binlog.proto",
-            messageType: "binlog.BinLog",
-            direction: "decode"
+            messageType: "binlog.BinLog"
         });
 
-        var buf = decoder.encode(msg);
+        var buf = decoder.encode(msg, true);
         var s = new Readable({
             objectMode: true,
             read: function () {
-                var b = Buffer.concat([buf,buf]);
-                this.push(b.slice(0,10));
+                var b = Buffer.concat([buf, buf]);
+                this.push(b.slice(0, 10));
                 this.push(b.slice(10))
                 this.push(null);
             }
@@ -227,7 +220,7 @@ describe('ProtobufTransform', () => {
         });
         sc.on('finish', () => {
             if (count != 2) {
-                done('Not 2 messages seen, but: '+count)
+                done('Not 2 messages seen, but: ' + count)
             } else {
                 done();
             }
