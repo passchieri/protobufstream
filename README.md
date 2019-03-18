@@ -16,7 +16,7 @@ Installation
 Install with npm
 
 ```bash
-$ npm install protobufstream
+$ npm install @igor.passchier/protobufstream
 ```
 
 Usage example
